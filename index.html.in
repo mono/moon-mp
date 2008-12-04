@@ -1,0 +1,40 @@
+<html>
+<head>
+<script type="application/x-javascript">
+<!--
+function install (event) {
+	var params = {
+    	"Moonlight Media Player": { URL: event.target.href,
+        	IconURL: event.target.getAttribute ("iconURL"),
+        	Hash: event.target.getAttribute ("hash"),
+         	toString: function () { return this.URL; }
+    	}
+  	};
+  	
+	InstallTrigger.install (params);
+
+  	return false;
+}
+-->
+</script>
+</head>
+<body>
+
+<h1>Moonlight Media Player</h1>
+<p>The Moonlight Media Player is an extension for Firefox that emulates the Windows Media Player ActiveX control. When embedded Windows Media content is found, this extension loads a generic Moonlight based player control to support the content.</p>
+
+<h2>Install</h2>
+
+<p>Firefox 2 and newer is supported. Additionally, you must have <a href="http://go-mono.com/moonlight/">Moonlight</a> or <a href="http://silverlight.net/">Silverlight</a> installed. This should work on Mac OS X as well, but it has not been tested.</p>
+
+<ul>
+<li><a href="@XPI_FILE@"
+  iconURL="http://banshee-project.org/~abock/moon-media/icon.png"
+  hash="sha1:@XPI_SHA1_HASH@"
+  onclick="return install(event);">Install Moonlight Media Player (version @VERSION@)</a></li>
+<li><a href="moonlight-media-player-@VERSION@.tar.bz2">Download Source Tarball</a></li>
+</ul>
+
+</body>
+</html>
+

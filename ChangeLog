@@ -1,0 +1,5 @@
+2008-12-04  Aaron Bockover  <abockover@novell.com>
+
+	* Initial Import: extension works for FF3, the media player does not
+	yet bind to the SL DOM element
+
