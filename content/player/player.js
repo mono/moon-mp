@@ -1,11 +1,3 @@
-/*
- * TODO:
- * 1) extend the silverDom object with functions and properties that WMP exposes (play, pause, etc.)
- * 2) remove the StreamAsFile hook for mimetypes, it can be handled in JS
- *
- */
-
- 
 function delegate (target, callback) {
     return function () { callback.apply (target, arguments); }
 }

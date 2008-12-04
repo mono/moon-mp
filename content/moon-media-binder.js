@@ -66,7 +66,7 @@ MoonMediaBinder.prototype = {
         MoonMediaExtension.LoadScriptModule ("chrome://moon-media/content/player/player.js");
         MoonMediaExtension.LoadScriptModule ("chrome://moon-media/content/player/wmp-controls.js");
         
-        new __MoonEmbeddedMediaPlayer (silver);
+        new __MoonEmbeddedMediaPlayer (silver.wrappedJSObject);
     },
     
     AppendObjectParameter: function (doc, object, name, value) {
