@@ -43,7 +43,7 @@ MoonMediaBinder.prototype = {
         parent.removeChild (embed);
 
         // Create the silverlight object with the old embed ID
-        var silver = doc.wrappedJSObject.createElement ("object");
+        var silver = doc.createElement ("object");
         silver.type = "application/x-silverlight";
         silver.id = embed.id;
         silver.width = embed.width;

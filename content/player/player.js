@@ -41,59 +41,54 @@ __MoonEmbeddedMediaPlayer.prototype = {
     control_bar_hidden_top: -1,
     
     _OnLoad: function (sender) {
-        alert (sender.getHost);
-        alert (sender.getHost ());
+        this.control = sender.getHost ();
         
-       // this.control = sender.getHost ();
-        
-        /*this._LoadElements (control);
+        this._LoadElements (sender);
         this._ConstructInterface ();
         this._ConnectEvents ();
         this._MapAttributes ();
+        this._ImplementWmpApi ();
         this.Idle ();
-        
-        // Install WMP API directly on the <embed> SL object
-        //this.ExtendSilver ();
 
         this.control.Content.OnResize = delegate (this, this._OnResize);
         this.control.Content.OnFullScreenChange = delegate (this, this._OnFullScreenChange);
-        this.loaded = true;*/
+        this.loaded = true;
     },
     
-    _LoadElements: function (control) {
+    _LoadElements: function (root) {
         this.xaml = {
             // Controls/UI
-            root:                 control,
+            root:                 root,
 
-            background:           control.FindName ("Background"),
+            background:           root.FindName ("Background"),
 
-            video_element:        control.FindName ("VideoElement"),
-            video_window:         control.FindName ("VideoWindow"),
-            video_brush:          control.FindName ("VideoBrush"),
+            video_element:        root.FindName ("VideoElement"),
+            video_window:         root.FindName ("VideoWindow"),
+            video_brush:          root.FindName ("VideoBrush"),
 
-            control_bar:          control.FindName ("ControlBar"),
-            control_bar_bg:       control.FindName ("ControlBarBackground"),
-            left_controls:        control.FindName ("LeftControls"),
-            center_controls:      control.FindName ("CenterControls"),
-            right_controls:       control.FindName ("RightControls"),
+            control_bar:          root.FindName ("ControlBar"),
+            control_bar_bg:       root.FindName ("ControlBarBackground"),
+            left_controls:        root.FindName ("LeftControls"),
+            center_controls:      root.FindName ("CenterControls"),
+            right_controls:       root.FindName ("RightControls"),
 
-            seek_slider:          control.FindName ("SeekSlider"),
-            seek_slider_border:   control.FindName ("SeekSliderBorder"),
-            seek_slider_trough:   control.FindName ("SeekSliderTrough"),
-            seek_slider_played:   control.FindName ("SeekSliderPlayed"),
-            seek_slider_buffered: control.FindName ("SeekSliderBuffered"),
-            position:             control.FindName ("Position"),
-            position_text:        control.FindName ("PositionText"),
+            seek_slider:          root.FindName ("SeekSlider"),
+            seek_slider_border:   root.FindName ("SeekSliderBorder"),
+            seek_slider_trough:   root.FindName ("SeekSliderTrough"),
+            seek_slider_played:   root.FindName ("SeekSliderPlayed"),
+            seek_slider_buffered: root.FindName ("SeekSliderBuffered"),
+            position:             root.FindName ("Position"),
+            position_text:        root.FindName ("PositionText"),
 
             play_button:          this._CreateButton ("PlayButton", "PlayPauseIcons"),
 
             options_button:       this._CreateButton ("OptionsButton"),
             
             // Storyboards and Animations
-            control_bar_storyboard:        control.FindName ("ControlBarStoryboard"),
-            control_bar_animation:         control.FindName ("ControlBarAnimation"),
-            seek_slider_played_storyboard: control.FindName ("SeekSliderPlayedStoryboard"),
-            seek_slider_played_animation:  control.FindName ("SeekSliderPlayedAnimation"),
+            control_bar_storyboard:        root.FindName ("ControlBarStoryboard"),
+            control_bar_animation:         root.FindName ("ControlBarAnimation"),
+            seek_slider_played_storyboard: root.FindName ("SeekSliderPlayedStoryboard"),
+            seek_slider_played_animation:  root.FindName ("SeekSliderPlayedAnimation"),
         };
         
         this.xaml.play_icon_storyboard  = this.xaml.play_button.FindName ("PlayIconStoryboard");
@@ -101,7 +96,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
         this.xaml.pause_icon_storyboard = this.xaml.play_button.FindName ("PauseIconStoryboard");
         this.xaml.pause_icon_animation  = this.xaml.play_button.FindName ("PauseIconAnimation");
         
-        control.FindName ("ErrorOverlay").Visibility = "Collapsed";
+        root.FindName ("ErrorOverlay").Visibility = "Collapsed";
     },
 
     _ConstructInterface: function () {
@@ -141,7 +136,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
         this.xaml.root.AddEventListener ("keydown", delegate (this, this._OnKeyDown));
         this.xaml.root.AddEventListener ("mouseenter", delegate (this, this._OnMouseEnter));
         this.xaml.root.AddEventListener ("mouseleave", delegate (this, this._OnMouseLeave));
-        
+
         this.xaml.play_button.AddEventListener ("mouseleftbuttondown", delegate (this, this._OnPlayPauseClicked));
 
         this.xaml.video_element.AddEventListener ("currentstatechanged", delegate (this, this._OnMediaCurrentStateChanged));
@@ -155,19 +150,22 @@ __MoonEmbeddedMediaPlayer.prototype = {
             return x.toLowerCase () == "true";
         }
         
-        for (var i = 0, n = this.control.attributes.length; i < n; i++) {
-            var value = this.control.attributes[i].nodeValue;
-            switch (this.control.attributes[i].nodeName.toLowerCase ()) {
+        var params = this.control.childNodes;
+        
+        for (var i = 0, n = params.length; i < n; i++) {
+            if (!(params[i] instanceof HTMLParamElement)) {
+                continue;
+            }
+            
+            value = params[i].value;
+            switch (params[i].name.toLowerCase ()) {
                 case "bgcolor":      this.xaml.background.Fill = value; break;
                 case "showcontrols": this.xaml.control_bar.Visibility = to_bool (value) ? "Visible" : "Collapsed"; break;
                 
                 case "autostart":    this.xaml.video_element.AutoPlay = to_bool (value); break;
                 case "loop":         this.loop_playback = to_bool (value); break;
                 
-                case "source":
-                case "src":
-                case "filename":
-                case "url":          this.LoadSource (value); break;
+                case "media-source": this.LoadSource (value); break;
             }
         }
     },
@@ -470,22 +468,21 @@ __MoonEmbeddedMediaPlayer.prototype = {
         }
     },
     
-    Log: function (x) {
-        __MoonEmbeddedLog (x);
-    },
-    
-  /*  ExtendSilver: function () {
-        this.silver["MoonMediaPlayer"] = this;
-        this.silver["controls"] = new __MoonEmbeddedWmpControls (this);
+    _ImplementWmpApi: function () {
+        this.control["MoonMediaPlayer"] = this;
+        this.control["controls"] = new __MoonEmbeddedWmpControls (this);
         
         var properties = [ "src", "source", "filename", "url" ];
         var self = this;
         for (var p in properties) {
-            delete this.silver[properties[p]];
+            delete this.control[properties[p]];
             this.control.__defineSetter__ (properties[p], function (s) { self.LoadSource (s); });
             this.control.__defineGetter__ (properties[p], function () { return self.xaml.video_element.Source; });
         }
-    }*/
+    },
+    
+    Log: function (x) {
+    },
 }
 
 
