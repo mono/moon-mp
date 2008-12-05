@@ -2,13 +2,16 @@ function delegate (target, callback) {
     return function () { callback.apply (target, arguments); }
 }
 
-__MoonEmbeddedMediaPlayer = function (silverDom) {
-    this.silver = silverDom;
-    this.silver.OnLoad = delegate (this, this._OnLoad);
+function __MoonMediaPlayerOnLoad (control, context, root_element) {
+    var player = new __MoonEmbeddedMediaPlayer ();
+    player._OnLoad (control, context, root_element);
+}
+
+__MoonEmbeddedMediaPlayer = function () {
 }
 
 __MoonEmbeddedMediaPlayer.prototype = {
-    silver: null,
+    control: null,
     xaml: null,
     loaded: false,
     
@@ -37,20 +40,23 @@ __MoonEmbeddedMediaPlayer.prototype = {
     control_bar_visible_top: -1,
     control_bar_hidden_top: -1,
     
-    _OnLoad: function (control, context, root_element) {
-        alert ("OMG");
-        this._LoadElements (control);
+    _OnLoad: function (sender) {
+        alert (sender.getHost);
+        
+       // this.control = sender.getHost ();
+        
+        /*this._LoadElements (control);
         this._ConstructInterface ();
         this._ConnectEvents ();
         this._MapAttributes ();
         this.Idle ();
         
         // Install WMP API directly on the <embed> SL object
-        this.ExtendSilver ();
+        //this.ExtendSilver ();
 
-        this.silver.Content.OnResize = delegate (this, this._OnResize);
-        this.silver.Content.OnFullScreenChange = delegate (this, this._OnFullScreenChange);
-        this.loaded = true;
+        this.control.Content.OnResize = delegate (this, this._OnResize);
+        this.control.Content.OnFullScreenChange = delegate (this, this._OnFullScreenChange);
+        this.loaded = true;*/
     },
     
     _LoadElements: function (control) {
@@ -148,9 +154,9 @@ __MoonEmbeddedMediaPlayer.prototype = {
             return x.toLowerCase () == "true";
         }
         
-        for (var i = 0, n = this.silver.attributes.length; i < n; i++) {
-            var value = this.silver.attributes[i].nodeValue;
-            switch (this.silver.attributes[i].nodeName.toLowerCase ()) {
+        for (var i = 0, n = this.control.attributes.length; i < n; i++) {
+            var value = this.control.attributes[i].nodeValue;
+            switch (this.control.attributes[i].nodeName.toLowerCase ()) {
                 case "bgcolor":      this.xaml.background.Fill = value; break;
                 case "showcontrols": this.xaml.control_bar.Visibility = to_bool (value) ? "Visible" : "Collapsed"; break;
                 
@@ -168,8 +174,8 @@ __MoonEmbeddedMediaPlayer.prototype = {
     // Layout and Positioning Logic
 
     _OnResize: function () {
-        this.xaml.background.Width = this.silver.Content.ActualWidth;
-        this.xaml.background.Height = this.silver.Content.ActualHeight; 
+        this.xaml.background.Width = this.control.Content.ActualWidth;
+        this.xaml.background.Height = this.control.Content.ActualHeight; 
 
         // position the main control bar
         this.xaml.control_bar.Height = this.control_bar_height;
@@ -400,7 +406,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
     // XAML Templates
 
     _CreateButton: function (name, icon_name) {
-        var button = this.silver.Content.createFromXaml ('\
+        var button = this.control.Content.createFromXaml ('\
             <Canvas Name="' + name + '" Width="27" Height="22" Background="transparent"> \
               <Rectangle Width="27" Height="22" RadiusX="2" RadiusY="2"> \
                 <Rectangle.Fill> \
@@ -442,7 +448,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
             return button;
         }
 
-        var icon = this.silver.Content.FindName (icon_name);
+        var icon = this.control.Content.FindName (icon_name);
         if (icon == null) {
             return button;
         }
@@ -467,7 +473,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
         __MoonEmbeddedLog (x);
     },
     
-    ExtendSilver: function () {
+  /*  ExtendSilver: function () {
         this.silver["MoonMediaPlayer"] = this;
         this.silver["controls"] = new __MoonEmbeddedWmpControls (this);
         
@@ -475,10 +481,10 @@ __MoonEmbeddedMediaPlayer.prototype = {
         var self = this;
         for (var p in properties) {
             delete this.silver[properties[p]];
-            this.silver.__defineSetter__ (properties[p], function (s) { self.LoadSource (s); });
-            this.silver.__defineGetter__ (properties[p], function () { return self.xaml.video_element.Source; });
+            this.control.__defineSetter__ (properties[p], function (s) { self.LoadSource (s); });
+            this.control.__defineGetter__ (properties[p], function () { return self.xaml.video_element.Source; });
         }
-    }
+    }*/
 }
 
 

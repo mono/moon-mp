@@ -17,8 +17,19 @@ MoonMediaBinder.prototype = {
         "url"
     ],
     
+    scripts_to_load: [
+        "chrome://moon-media/content/player/player.js",
+        "chrome://moon-media/content/player/wmp-controls.js"
+    ],
+    
     LoadEmbed: function (doc, embed) {
         var parent = embed.parentNode;
+        
+        // Load player JS into the DOM
+        for (var i = 0, n = this.scripts_to_load.length; !this.scripts_loaded && i < n; i++) {
+            this.LoadUnsafeScript (doc, this.scripts_to_load[i]);
+        }
+        this.scripts_to_load = [];
 
         // Load XAML from the chrome into the HTML DOM
         var xaml = doc.createElement ("script");
@@ -32,7 +43,7 @@ MoonMediaBinder.prototype = {
         parent.removeChild (embed);
 
         // Create the silverlight object with the old embed ID
-        var silver = doc.createElement ("object");
+        var silver = doc.wrappedJSObject.createElement ("object");
         silver.type = "application/x-silverlight";
         silver.id = embed.id;
         silver.width = embed.width;
@@ -40,6 +51,7 @@ MoonMediaBinder.prototype = {
         
         // Add a parameter to the SL object to source in the XAML script        
         this.AppendObjectParameter (doc, silver, "source", "#" + xaml.id);
+        this.AppendObjectParameter (doc, silver, "onload", "__MoonMediaPlayerOnLoad");
         
         // Migrate any attributes from the old embed
         var attributes = embed.wrappedJSObject.attributes;
@@ -59,14 +71,8 @@ MoonMediaBinder.prototype = {
         if (embed_source != null) {
             this.AppendObjectParameter (doc, silver, "media-source", embed_source);
         }
-
-        // Load the SL object into the HTML DOM
+        
         parent.insertBefore (silver, xaml);
-        
-        MoonMediaExtension.LoadScriptModule ("chrome://moon-media/content/player/player.js");
-        MoonMediaExtension.LoadScriptModule ("chrome://moon-media/content/player/wmp-controls.js");
-        
-        new __MoonEmbeddedMediaPlayer (silver.wrappedJSObject);
     },
     
     AppendObjectParameter: function (doc, object, name, value) {
@@ -74,6 +80,17 @@ MoonMediaBinder.prototype = {
         param.name = name;
         param.value = value;
         object.appendChild (param);
+    },
+    
+    LoadUnsafeScript: function (doc, uri) {
+        this.LoadUnsafeScriptFromString (doc, this.GetFileContents (uri));
+    },
+    
+    LoadUnsafeScriptFromString: function (doc, contents) {
+        var script = doc.createElement ("script");
+        script.type = "text/javascript";
+        script.appendChild (doc.createTextNode (contents));
+        doc.getElementsByTagName ("head")[0].appendChild (script);
     },
     
     GetFileContents: function (url) {
