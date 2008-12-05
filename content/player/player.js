@@ -2,9 +2,9 @@ function delegate (target, callback) {
     return function () { callback.apply (target, arguments); }
 }
 
-function __MoonMediaPlayerOnLoad (control, context, root_element) {
+function __MoonMediaPlayerOnLoad (sender) {
     var player = new __MoonEmbeddedMediaPlayer ();
-    player._OnLoad (control, context, root_element);
+    player._OnLoad (sender);
 }
 
 __MoonEmbeddedMediaPlayer = function () {
@@ -42,6 +42,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
     
     _OnLoad: function (sender) {
         alert (sender.getHost);
+        alert (sender.getHost ());
         
        // this.control = sender.getHost ();
         
