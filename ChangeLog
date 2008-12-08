@@ -1,3 +1,9 @@
+2008-12-08  Aaron Bockover  <abockover@novell.com>
+
+	* content/player/player.js:
+	* content/player/player.xaml: Implemented volume slider and full screen
+	icons; added keyboard support for play/pause and volume up/dowin
+
 2008-12-04  Aaron Bockover  <abockover@novell.com>
 
 	* Initial Import: extension works for FF3, the media player does not

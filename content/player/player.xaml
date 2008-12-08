@@ -49,6 +49,15 @@
               <GradientStop Offset="1.0" Color="#3fff"/>
             </LinearGradientBrush>
           </Rectangle.Fill>
+        </Rectangle>        
+        <Rectangle Name="SeekSliderDownloaded" RadiusX="4" RadiusY="4" Height="10">
+          <Rectangle.Fill>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+              <GradientStop Offset="0.0" Color="#11ffffff"/>
+              <GradientStop Offset="0.4" Color="#2fff"/>
+              <GradientStop Offset="1.0" Color="#3fff"/>
+            </LinearGradientBrush>
+          </Rectangle.Fill>
         </Rectangle>
         <Rectangle Name="SeekSliderPlayed" RadiusX="4" RadiusY="4" Height="10">
           <Rectangle.Resources>
@@ -83,12 +92,70 @@
     </Canvas>
     
     <Canvas Name="RightControls">
-
     </Canvas>
   </Canvas>
-        <Canvas Name="VolumeSlider" Width="30" Height="12">
-        <Path Fill="#afff" Data="M 0 12 L 30 12 L 30 0 Z"/>
-      </Canvas>
+  
+  <Canvas Name="VolumeSlider" Width="41" Height="12" Canvas.Top="4">
+    <Path Name="VolumeSliderTrough" StrokeThickness="1.0" Canvas.Top="0.5" Canvas.Left="0.5">
+      <Path.Fill>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+          <GradientStop Offset="0.0" Color="#0fff"/>
+          <GradientStop Offset="0.6" Color="#1fff"/>
+        </LinearGradientBrush>
+      </Path.Fill>
+      <Path.Stroke>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+          <GradientStop Offset="0.0" Color="#6fff"/>
+          <GradientStop Offset="0.25" Color="#9fff"/>
+          <GradientStop Offset="1.0" Color="#2fff"/>
+        </LinearGradientBrush>
+      </Path.Stroke>
+    </Path>
+    <Path Name="VolumeSliderLevel" Data="M 0 12 L 40 12 L 40 0 Z" Opacity="0.6">
+      <Path.Fill>
+        <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+          <GradientStop Offset="0.0" Color="#6fff"/>
+          <GradientStop Offset="0.25" Color="#9fff"/>
+          <GradientStop Offset="1.0" Color="#2fff"/>
+        </LinearGradientBrush>
+      </Path.Fill>
+    </Path>
+  </Canvas>
+  
+  <Canvas Name="FullScreenIcon" Width="14" Height="14" Visibility="Collapsed">
+    <Canvas Name="OpenFullScreenIcon" Width="14" Height="14" Opacity="1">
+      <Path Data="
+        M6,0 L0,0 L0,6 Z
+        M0,8 L0,14 L6,14 Z
+        M8,14 L14,14 L14,8 Z
+        M14,6 L14,0 L8,0 Z
+        ">
+        <Path.Fill>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0.0" Color="#6fff"/>
+            <GradientStop Offset="0.25" Color="#9fff"/>
+            <GradientStop Offset="1.0" Color="#3fff"/>
+          </LinearGradientBrush>
+        </Path.Fill>
+      </Path>
+    </Canvas>
+    <Canvas Name="CloseFullScreenIcon" Width="14" Height="14" Opacity="0">
+      <Path Data="
+        M6,6 L6,0 L0,6 Z
+        M6,8 L6,14 L0,8 Z
+        M8,8 L8,14 L14,8 Z
+        M8,0 L8,6 L14,6 Z
+        ">
+        <Path.Fill>
+          <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+            <GradientStop Offset="0.0" Color="#6fff"/>
+            <GradientStop Offset="0.25" Color="#9fff"/>
+            <GradientStop Offset="1.0" Color="#3fff"/>
+          </LinearGradientBrush>
+        </Path.Fill>
+      </Path>
+    </Canvas>
+  </Canvas>
 
   <!-- Exported by Inkscape, tweaked by hand -->
 

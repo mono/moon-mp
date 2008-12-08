@@ -41,7 +41,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
     control_bar_hidden_top: -1,
     
     _OnLoad: function (sender) {
-        this.control = sender.getHost ();
+        this.control = sender.GetHost ();
         
         this._LoadElements (sender);
         this._ConstructInterface ();
@@ -58,31 +58,35 @@ __MoonEmbeddedMediaPlayer.prototype = {
     _LoadElements: function (root) {
         this.xaml = {
             // Controls/UI
-            root:                 root,
+            root:                   root,
 
-            background:           root.FindName ("Background"),
+            background:             root.FindName ("Background"),
 
-            video_element:        root.FindName ("VideoElement"),
-            video_window:         root.FindName ("VideoWindow"),
-            video_brush:          root.FindName ("VideoBrush"),
+            video_element:          root.FindName ("VideoElement"),
+            video_window:           root.FindName ("VideoWindow"),
+            video_brush:            root.FindName ("VideoBrush"),
 
-            control_bar:          root.FindName ("ControlBar"),
-            control_bar_bg:       root.FindName ("ControlBarBackground"),
-            left_controls:        root.FindName ("LeftControls"),
-            center_controls:      root.FindName ("CenterControls"),
-            right_controls:       root.FindName ("RightControls"),
+            control_bar:            root.FindName ("ControlBar"),
+            control_bar_bg:         root.FindName ("ControlBarBackground"),
+            left_controls:          root.FindName ("LeftControls"),
+            center_controls:        root.FindName ("CenterControls"),
+            right_controls:         root.FindName ("RightControls"),
 
-            seek_slider:          root.FindName ("SeekSlider"),
-            seek_slider_border:   root.FindName ("SeekSliderBorder"),
-            seek_slider_trough:   root.FindName ("SeekSliderTrough"),
-            seek_slider_played:   root.FindName ("SeekSliderPlayed"),
-            seek_slider_buffered: root.FindName ("SeekSliderBuffered"),
-            position:             root.FindName ("Position"),
-            position_text:        root.FindName ("PositionText"),
+            seek_slider:            root.FindName ("SeekSlider"),
+            seek_slider_border:     root.FindName ("SeekSliderBorder"),
+            seek_slider_trough:     root.FindName ("SeekSliderTrough"),
+            seek_slider_played:     root.FindName ("SeekSliderPlayed"),
+            seek_slider_buffered:   root.FindName ("SeekSliderBuffered"),
+            seek_slider_downloaded: root.FindName ("SeekSliderDownloaded"),
+            position:               root.FindName ("Position"),
+            position_text:          root.FindName ("PositionText"),
+            
+            volume_slider:          root.FindName ("VolumeSlider"),
+            volume_slider_trough:   root.FindName ("VolumeSliderTrough"),
+            volume_slider_level:    root.FindName ("VolumeSliderLevel"),
 
-            play_button:          this._CreateButton ("PlayButton", "PlayPauseIcons"),
-
-            options_button:       this._CreateButton ("OptionsButton"),
+            play_button:            this._CreateButton ("PlayButton", "PlayPauseIcons"),
+            options_button:         this._CreateButton ("OptionsButton", "FullScreenIcon"),
             
             // Storyboards and Animations
             control_bar_storyboard:        root.FindName ("ControlBarStoryboard"),
@@ -96,26 +100,31 @@ __MoonEmbeddedMediaPlayer.prototype = {
         this.xaml.pause_icon_storyboard = this.xaml.play_button.FindName ("PauseIconStoryboard");
         this.xaml.pause_icon_animation  = this.xaml.play_button.FindName ("PauseIconAnimation");
         
+        this.xaml.open_fs_icon = this.xaml.options_button.FindName ("OpenFullScreenIcon");
+        this.xaml.close_fs_icon  = this.xaml.options_button.FindName ("CloseFullScreenIcon");
+        
         root.FindName ("ErrorOverlay").Visibility = "Collapsed";
     },
 
     _ConstructInterface: function () {
         this._ContainerPack (this.xaml.left_controls, this.xaml.play_button);
-        this._ContainerPack (this.xaml.right_controls, this.xaml.options_button);
+        this._ContainerPack (this.xaml.right_controls, this.xaml.volume_slider);
+        this._ContainerPack (this.xaml.right_controls, this.xaml.options_button, this.control_spacing);
+        
+        this.xaml.volume_slider_trough["Data"] = this.xaml.volume_slider_level["Data"];
+        this._UpdateVolume ();
     },
 
     _ContainerPack: function (container, child, leading_pad) {
-        var left = 0;
-        for (var i = 0, n = container.Children.Count; i < n; i++) {
-            var _child = container.Children.GetItem (i);
-            left += _child["Canvas.Left"];
-            if (i == n - 1) {
-                left += _child.Width + leading_pad;
-            }
+        if (container.Children.Count > 0) {
+            var last_child = container.Children.GetItem (container.Children.Count - 1);
+            child["Canvas.Left"] = last_child["Canvas.Left"] + last_child.Width + 
+                (isNaN (leading_pad) ? 0 : leading_pad);
+        } else {
+            child["Canvas.Left"] = 0;
         }
         
-        child["Canvas.Left"] = left;
-        container.Children.Add (child);
+        this._Reparent (child, container);
     },
 
     _ContainerAutosize: function (container) {
@@ -136,12 +145,19 @@ __MoonEmbeddedMediaPlayer.prototype = {
         this.xaml.root.AddEventListener ("keydown", delegate (this, this._OnKeyDown));
         this.xaml.root.AddEventListener ("mouseenter", delegate (this, this._OnMouseEnter));
         this.xaml.root.AddEventListener ("mouseleave", delegate (this, this._OnMouseLeave));
+        this.xaml.root.AddEventListener ("mousemove", delegate (this, this._OnMouseMove));
+        this.xaml.root.AddEventListener ("mouseleftbuttonup", delegate (this, this._OnMouseUp));
 
         this.xaml.play_button.AddEventListener ("mouseleftbuttondown", delegate (this, this._OnPlayPauseClicked));
+        this.xaml.options_button.AddEventListener ("mouseleftbuttondown", delegate (this, this._OnOptionsClicked));
+        
+        this.xaml.volume_slider.AddEventListener ("mouseleftbuttondown", delegate (this, this._OnVolumeMouseDown));
 
         this.xaml.video_element.AddEventListener ("currentstatechanged", delegate (this, this._OnMediaCurrentStateChanged));
         this.xaml.video_element.AddEventListener ("mediaopened", delegate (this, this._OnMediaOpened));
         this.xaml.video_element.AddEventListener ("mediaended", delegate (this, this._OnMediaEnded));
+        this.xaml.video_element.AddEventListener ("downloadprogresschanged", delegate (this, this._OnDownloadProgressChanged));
+        this.xaml.video_element.AddEventListener ("bufferingprogresschanged", delegate (this, this._OnBufferingProgressChanged));
     },
     
     _MapAttributes: function () {
@@ -217,17 +233,17 @@ __MoonEmbeddedMediaPlayer.prototype = {
         }
 
         this._PositionVideo ();
+        this._OnBufferingProgressChanged (this.xaml.video_element);
+        this._OnDownloadProgressChanged (this.xaml.video_element);
     },
 
     _OnFullScreenChange: function () {
         this._OnResize ();
+        this.xaml.open_fs_icon.Opacity = this.control.Content.FullScreen ? 0 : 1;
+        this.xaml.close_fs_icon.Opacity = this.control.Content.FullScreen ? 1 : 0;
     },
 
     _PositionSlider: function (smoothUpdate) {
-        // In case we need to clip...
-        // this.xaml.position_text.Clip = "M 0,0 H" + this.xaml.position.Width + " V" + 
-        //     this.xaml.position.Height + " H0 Z";
-
         // Compute the text box width and round up to the nearest 10 pixels to prevent
         // the slider from jittering if text width changes by a pixel or two
         var t_actual = this.xaml.position_text.ActualWidth;
@@ -317,19 +333,38 @@ __MoonEmbeddedMediaPlayer.prototype = {
     },
 
     _OnKeyDown: function (o, args) {
-        if (args.Key == 35 || args.Key == 66) {
-            o.GetHost ().Content.FullScreen = true;
+        switch (args.Key) {
+            /* F, F11 */ case 35: case 66: this.control.Content.FullScreen = true; break;
+            /* Up     */ case 15: this.PlaybackVolume += 0.05; break;
+            /* Down   */ case 17: this.PlaybackVolume -= 0.05; break;
+            /* Space  */ case 9:  this.TogglePlaying (); break;
         }
+        
+        this.ShowControls ();
     },
     
     _OnMouseEnter: function (o, args) {
-        this.xaml.control_bar_animation.To = this.control_bar_visible_top;
-        this.xaml.control_bar_storyboard.Begin ();
+        this.ShowControls ();
     },
     
     _OnMouseLeave: function (o, args) {
-        this.xaml.control_bar_animation.To = this.control_bar_hidden_top;
-        this.xaml.control_bar_storyboard.Begin ();
+        this._ClearHideControlsTimeout ();
+        this.hide_controls_timeout = setTimeout (delegate (this, this.HideControls), 1000);
+    },
+    
+    _OnMouseMove: function (o, args) {
+        if (this.volume_dragging) {
+            this._UpdateVolumeFromMouse (args);
+        } else {
+            this.ShowControls ();
+        }
+    },
+    
+    _OnMouseUp: function (o, args) {
+        if (this.volume_dragging) {
+            this._UpdateVolumeFromMouse (args);
+            this.volume_dragging = false;
+        }
     },
     
     _OnMediaCurrentStateChanged: function (o, args) {
@@ -366,6 +401,14 @@ __MoonEmbeddedMediaPlayer.prototype = {
         }
     },
     
+    _OnBufferingProgressChanged: function (o, args) {
+        this.xaml.seek_slider_buffered.Width = this.xaml.seek_slider_trough.Width * o.BufferingProgress;
+    },
+    
+    _OnDownloadProgressChanged: function (o, args) {
+        this.xaml.seek_slider_downloaded.Width = this.xaml.seek_slider_trough.Width * o.DownloadProgress;
+    },
+    
     _OnMediaOpened: function (o, args) {
         this._PositionVideo ();
     },
@@ -387,19 +430,70 @@ __MoonEmbeddedMediaPlayer.prototype = {
     },
 
     _OnPlayPauseClicked: function (o, args) {
+        this.TogglePlaying ();
+    },
+    
+    _OnOptionsClicked: function (o, args) {
+        this.control.Content.FullScreen = !this.control.Content.FullScreen;    
+    },
+    
+    _OnVolumeMouseDown: function (o, args) {
+        this._ClearHideControlsTimeout ();
+        this.volume_dragging = true;
+    },
+    
+    // Utility Methods
+    
+    _UpdateVolumeFromMouse: function (args) {
+        this.PlaybackVolume = args.GetPosition (this.xaml.volume_slider).X / this.xaml.volume_slider.Width;
+    },
+    
+    _UpdateVolume: function () {
+        this.xaml.volume_slider_level.Clip = "M 0,0 H" + (this.xaml.volume_slider.Width * 
+            this.xaml.video_element.Volume) + " V100 H0 Z";
+    },
+    
+    _ClearHideControlsTimeout: function () {
+        if (this.hide_controls_timeout) {
+            clearTimeout (this.hide_controls_timeout);
+        }
+    },
+    
+    ShowControls: function () {
+        this._ClearHideControlsTimeout ();
+        
+        if (this.xaml.control_bar_animation.To != this.control_bar_visible_top) {
+            this.xaml.control_bar_animation.To = this.control_bar_visible_top;
+            this.xaml.control_bar_storyboard.Begin ();
+        }
+        
+        this.hide_controls_timeout = setTimeout (delegate (this, this.HideControls), 3000);
+    },
+    
+    HideControls: function () {
+        this.volume_dragging = false;
+        this.xaml.control_bar_animation.To = this.control_bar_hidden_top;
+        this.xaml.control_bar_storyboard.Begin ();
+    },
+    
+    _FormatSeconds: function (seconds) {
+        return Math.floor (seconds / 60) + ":" + 
+            (seconds % 60 < 10 ? "0" : "") +
+            Math.floor (seconds % 60);
+    },
+    
+    get PlaybackVolume () { return this.xaml.video_element.Volume; },
+    set PlaybackVolume (x) { 
+        this.xaml.video_element.Volume = Math.max (0, Math.min (x, 1));
+        this._UpdateVolume ();
+    },
+    
+    TogglePlaying: function () {
         if (this.xaml.video_element.CurrentState == "Playing") {
             this.xaml.video_element.Pause ();
         } else {
             this.xaml.video_element.Play ();
         }
-    },
-
-    // Utility Methods
-
-    _FormatSeconds: function (seconds) {
-        return Math.floor (seconds / 60) + ":" + 
-            (seconds % 60 < 10 ? "0" : "") +
-            Math.floor (seconds % 60);
     },
 
     // XAML Templates
@@ -452,14 +546,24 @@ __MoonEmbeddedMediaPlayer.prototype = {
             return button;
         }
 
-        icon.GetParent ().Children.Remove (icon);
-        button.Children.Add (icon);
+        this._Reparent (icon, button);
 
         icon["Canvas.Left"] = (button.Width - icon.Width) / 2;
         icon["Canvas.Top"] = (button.Height - icon.Height) / 2;
         icon.Visibility = "Visible";
 
         return button;
+    },
+    
+    _Reparent: function (child, new_parent) {
+        if (child) {
+            var parent = child.GetParent ();
+            if (parent) {
+                parent.Children.Remove (child);
+            }
+            
+            new_parent.Children.Add (child);
+        }
     },
     
     _Animate: function (animations, to_value) {
@@ -482,6 +586,7 @@ __MoonEmbeddedMediaPlayer.prototype = {
     },
     
     Log: function (x) {
+        dump (x + "\n");
     },
 }
 
