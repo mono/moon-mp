@@ -19,6 +19,10 @@ var MoonMediaExtension = {
     
     Initialize: function () {
         window.removeEventListener ("load", MoonMediaExtension.Initialize, true);
+
+        var mime_editor = new MoonMimeEditor;
+        mime_editor.Initialize (MoonMediaExtension.SupportedMimeTypes);
+
         gBrowser.addEventListener ("load", MoonMediaExtension.OnDocumentLoaded, true);
         gBrowser.addEventListener("PluginNotFound", function (event) {
             try {

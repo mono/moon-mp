@@ -1,3 +1,17 @@
+2008-12-19  Aaron Bockover  <abockover@novell.com>
+
+	* content/moon-media-extension.js: Create a MoonMimeEditor
+
+	* content/moon-mime-editor.js: Began working with the RDF service to 
+	hopefully be able to add handlers for arbitrary mimetypes
+
+	* content/moon-console.js: Wrote a good console class with a proper
+	recursive object dumper that supports all types
+
+	* content/test-moon-console.html: Test cases for the console
+
+	* content/moon-media.xul: Load the console and the mime editor
+
 2008-12-08  Aaron Bockover  <abockover@novell.com>
 
 	* content/player/player.js:
