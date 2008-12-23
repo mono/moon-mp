@@ -6,8 +6,42 @@ var MoonConsole = {
         dump (x);
     },
 
+    _GetFunctionName: function (func, parent) {
+        if (!parent) {
+            return func ? func.name || "(anonymous)" : null;
+        }
+
+        for (var prop in parent) {
+            if (parent[prop] == func) {
+                var parent_name = parent.className || MoonConsole._GetFunctionName (parent.constructor);
+                return parent_name == "Object" ? prop : parent_name + "." + prop;
+            }
+        }
+    },
+
     Log: function (str) {
-        MoonConsole.console_driver (str + "\n");
+        MoonConsole.WriteLine (str);
+    },
+
+    Logf: function (parent, str) {
+        str = str || parent;
+        var caller_name = MoonConsole._GetFunctionName (MoonConsole.Logf.caller, 
+            arguments.length > 1 ? parent : null);
+        MoonConsole.WriteLine (caller_name + ": " + str);
+    },
+
+    Logfa: function (parent, args) {
+        var args_dump = []
+        for (var i = 0; i < arguments.length; i++) {
+            if (typeof arguments[i] == "object") {
+                args_dump.push (arguments[i].toString ());
+            } else {
+                args_dump.push (arguments[i]);
+            }
+        }
+
+        MoonConsole.Write (MoonConsole._GetFunctionName (MoonConsole.Logfa.caller, this) + ": ");
+        MoonConsole.ObjDump (args_dump);
     },
 
     Indent: function (indent, mult) {

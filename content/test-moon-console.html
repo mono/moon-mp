@@ -100,6 +100,40 @@ function RunTests () {
     }
 
     MoonConsole.ObjDump (a);
+
+    AppendConsole ("Logf Tests");
+
+    (function ClassicalDefinition () {
+        MoonConsole.Logf ("Hello");
+    }) ();
+
+    (function () { 
+        MoonConsole.Logf ("Totally Anonymous!");
+    }) ();
+
+    var x = {
+        ParentedFunction: function () {
+            MoonConsole.Logf (this, "What up");
+        }
+    }
+
+    x.ParentedFunction ();
+
+    function o () {
+    }
+    o.prototype.Another = function () { 
+        MoonConsole.Logf (this, "The other");
+    }
+    new o ().Another ();
+
+    function fail () {
+    }
+    fail.prototype = {
+        suck: function () {
+            MoonConsole.Logf (this, "Now that sucks");
+        }
+    }
+    new fail ().suck ();
 }
 </script>
 <script type="text/javascript">

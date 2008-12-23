@@ -1,3 +1,18 @@
+2008-12-23  Aaron Bockover  <abockover@novell.com>
+
+	* content/moon-media-content-listener.js: Listener that intercepts content 
+	type that are supported by the player, redirects requests to the internal
+	XUL Silverlight player
+
+	* content/uri-player.xul: Silverlight shell in XUL that embeds the player
+
+	* content/test-moon-console.html:
+	* content/moon-console.js: Added some more functions
+
+	* content/moon-media-extension.js: Create and register the listener
+
+	* content/player/player.js: Call XULMoonEmbeddedPlayerInit if defined
+
 2008-12-19  Aaron Bockover  <abockover@novell.com>
 
 	* content/moon-media-extension.js: Create a MoonMimeEditor

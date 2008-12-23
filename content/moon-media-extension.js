@@ -18,11 +18,7 @@ var MoonMediaExtension = {
     ],
     
     Initialize: function () {
-        window.removeEventListener ("load", MoonMediaExtension.Initialize, true);
-        
-        var observer_service = Components.classes["@mozilla.org/observer-service;1"]
-            .getService (Components.interfaces.nsIObserverService);
-        observer_service.addObserver (MoonMediaExtension, "http-on-examine-response", false);
+        window.removeEventListener ("load", MoonMediaExtension.Initialize, true); 
 
         gBrowser.addEventListener ("load", MoonMediaExtension.OnDocumentLoaded, true);
         gBrowser.addEventListener("PluginNotFound", function (event) {
@@ -34,51 +30,8 @@ var MoonMediaExtension = {
             }
         }, true);
 
-//        gBrowser.addProgressListener (new MoonMediaWebProgressListener);
-
-        try {
-        var uriLoader = Components.classes["@mozilla.org/uriloader;1"].getService(Components.interfaces.nsIURILoader);
-        uriLoader.registerContentListener (new MoonMediaContentListener);
-
-        } catch (e) {
-            MoonConsole.ObjDump (e);
-            }
-    },
-
-    observe: function (subject, topic, data) {
-        /*if (topic != "http-on-examine-response") {
-            return;
-        }
-
-        var http_channel = subject.QueryInterface (Components.interfaces.nsIHttpChannel);
-        var content_type = http_channel.getResponseHeader ("Content-Type");
-        var split_ofs = content_type.indexOf (";");
-        if (split_ofs >= 0) {
-            content_type = content_type.substring (0, split_ofs);
-        }
-
-        if (MoonMediaExtension.SupportedMimeTypes.indexOf (content_type) >= 0) {
-            var loaded_doc = null;
-            var loaded_win = null;
-
-            try {
-                var interface_requestor = http_channel.notificationCallbacks.QueryInterface (
-                    Components.interfaces.nsIInterfaceRequestor);
-                loaded_win = interface_requestor.getInterface (Components.interfaces.nsIDOMWindow);
-                loaded_doc = MoonMediaExtension.FindRootDocument (loaded_win.document);
-            } catch (e) {
-                MoonConsole.Log ("nsIHttpChannel for is not bound to an nsIDOMWindow for URI: " 
-                    + http_channel.URI.spec);
-            }
-
-            if (!loaded_doc) {
-                loaded_win = gBrowser.mCurrentBrowser;
-                loaded_doc = MoonMediaExtension.FindRootDocument (gBrowser.mCurrentBrowser.contentDocument);
-            }
-
-            loaded_win.stop ();
-            loaded_doc.body.innerHTML = http_channel.URI.spec;
-        }*/
+        var uri_content_listener = new MoonMediaContentListener;
+        uri_content_listener.Register ();
     },
 
     FindRootDocument: function (in_doc) {

@@ -1,10 +1,17 @@
 function MoonMediaContentListener () {
+    this.className = "MoonMediaContentListener";
 }
 
 MoonMediaContentListener.prototype = {
 
     loadCookie: null,
     parentContentListener: null,
+
+    Register: function () {
+        var uri_loader = Components.classes["@mozilla.org/uriloader;1"]
+            .getService (Components.interfaces.nsIURILoader);
+        uri_loader.registerContentListener (this);
+    },
     
     QueryInterface: function (iid) {
         if (iid.equals (Components.interfaces.nsIURIContentListener) ||
@@ -17,28 +24,53 @@ MoonMediaContentListener.prototype = {
     },
 
     onStartURIOpen: function (uri) {
-        MoonConsole.Log (uri.spec);
-        var abort = false;
+        MoonConsole.Logf (this, uri.spec);
+        return this.parentContentListener ? this.parentContentListener.onStartURIOpen (uri) : false;
+    },
 
-        if(!abort && this.parentContentListener) {
-            abort = this.parentContentListener.onStartURIOpen (aURI);
+    doContent: function (contentType, isContentPreferred, request, contentHandler) {
+        MoonConsole.Logfa.apply (this, arguments);
+
+        var loaded_doc = null;
+        var loaded_win = null;
+
+        try {
+            var interface_requestor = request.notificationCallbacks.QueryInterface (
+                Components.interfaces.nsIInterfaceRequestor);
+            loaded_win = interface_requestor.getInterface (Components.interfaces.nsIDOMWindow);
+            loaded_doc = MoonMediaExtension.FindRootDocument (loaded_win.document);
+        } catch (e) {
+            MoonConsole.Log ("nsIRequest is not bound to an nsIDOMWindow for URI: " 
+                + request.URI.spec);
         }
 
-        return abort;
-    },
+        if (!loaded_doc) {
+            loaded_win = gBrowser.mCurrentBrowser;
+            loaded_doc = MoonMediaExtension.FindRootDocument (gBrowser.mCurrentBrowser.contentDocument);
+        }
 
-    doContent: function (a,b,c,d) {
-        MoonConsole.Log ("doContent: " + a);
+        this.CreateEmbeddedForUri (loaded_win, loaded_doc, request.URI.spec);
+
         return false;
     },
 
-    canHandleContent: function(a,b,c) {
-        MoonConsole.Log ("canHandleContent: " + a);
-        return false;
+    canHandleContent: function (contentType, isContentPreferred, desiredContentType) {
+        MoonConsole.Logfa.apply (this, arguments);
+        return this.isPreferred (contentType);
     },
 
-    isPreferred: function (contentType, b) {
+    isPreferred: function (contentType, desiredContentType) {
+        MoonConsole.Logfa.apply (this, arguments);
         return MoonMediaExtension.SupportedMimeTypes.indexOf (contentType) >= 0;
-    }  
+    },
+
+    CreateEmbeddedForUri: function (window, document, uri) {
+        // Bind to the request URI by creating a new DOM and generating <embed> 
+        // against the contentType, which will in turn be translated to Silverlight
+        MoonConsole.Logfa.apply (this, arguments);
+
+        // For now I'll settle for this, but really we should reuse the current window
+        document.location = "chrome://moon-media/content/uri-player.xul?" + encodeURI (uri);
+    }
 }
 

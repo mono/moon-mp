@@ -53,6 +53,10 @@ __MoonEmbeddedMediaPlayer.prototype = {
         this.control.Content.OnResize = delegate (this, this._OnResize);
         this.control.Content.OnFullScreenChange = delegate (this, this._OnFullScreenChange);
         this.loaded = true;
+    
+        if (XULMoonEmbeddedPlayerInit) {
+            XULMoonEmbeddedPlayerInit (this);
+        }
     },
     
     _LoadElements: function (root) {
