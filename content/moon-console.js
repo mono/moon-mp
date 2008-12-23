@@ -57,9 +57,9 @@ var MoonConsole = {
         return count;
     },
 
-    _ObjDumpProperty: function (o, prop, invoke_getters, level, i, count, max_prop_len) {
-        var is_getter = !invoke_getters && o.__lookupGetter__ (prop);
-        var is_setter = o.__lookupSetter__ (prop);
+    _ObjDumpProperty: function (o, prop, invoke_getters, level, i, count, max_prop_len, stack) {
+        var is_getter = !invoke_getters && o.__lookupGetter__ && o.__lookupGetter__ (prop);
+        var is_setter = o.__lookupSetter__ && o.__lookupSetter__ (prop);
         var eval_prop = null;
 
         if (!is_getter && !is_setter) {
@@ -88,7 +88,7 @@ var MoonConsole = {
         } else if (is_setter) {
             MoonConsole.Write ("set (x)");
         } else {
-            MoonConsole.ObjDump (eval_prop, invoke_getters, level + 1);
+            MoonConsole.ObjDump (eval_prop, invoke_getters, level + 1, stack);
         }
 
         if (i < count - 1) {
@@ -98,13 +98,17 @@ var MoonConsole = {
         MoonConsole.WriteLine ();
     },
 
-    ObjDump: function (o, invoke_getters, level) {
+    ObjDump: function (o, invoke_getters, level, stack) {
+        if (!invoke_getters) {
+            invoke_getters = false;
+        }
+
         if (!level) {
             level = 0;
         }
 
-        if (!invoke_getters) {
-            invoke_getters = false;
+        if (!stack) {
+            stack = [];
         }
 
         var max_type_len = "function ()".length;
@@ -128,6 +132,14 @@ var MoonConsole = {
                 var obj_open_char = "{";
                 var obj_close_char = "}";
 
+                // Keep a stack of references to avoid recursively dumping; e.g.:
+                // var x = {}; x.self = x;
+                if (stack.indexOf (o) >= 0) {
+                    MoonConsole.Write ("<object already dumped>");
+                    break;
+                }
+                stack.push (o); 
+
                 if (o instanceof Array) {
                     count = o.length;
                     obj_open_char = "[";
@@ -147,7 +159,7 @@ var MoonConsole = {
                 } else if (o instanceof Array || o_name == "[object Object]") {
                     MoonConsole.Write (obj_open_char);
                 } else {
-                    var instanceof_str = o.constructor.name == "Object" 
+                    var instanceof_str = !o.constructor || o.constructor.name == "Object" 
                         ? "" : "[object " + o.constructor.name + "] ";
                     MoonConsole.Write (instanceof_str + "(" + o + ") {");
                 }
@@ -161,11 +173,11 @@ var MoonConsole = {
 
                 if (o instanceof Array) {
                     for (var i = 0; i < count; i++) {
-                        MoonConsole._ObjDumpProperty (o, i, invoke_getters, level, i, count, 0);
+                        MoonConsole._ObjDumpProperty (o, i, invoke_getters, level, i, count, 0, stack);
                     }
                 } else {
                     for (prop in o) {
-                        MoonConsole._ObjDumpProperty (o, prop, invoke_getters, level, i++, count, max_prop_len);
+                        MoonConsole._ObjDumpProperty (o, prop, invoke_getters, level, i++, count, max_prop_len, stack);
                     }
                 }
 

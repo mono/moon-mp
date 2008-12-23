@@ -75,15 +75,31 @@ function RunTests () {
 
     AppendConsole ("Property Getter Tests (Invoke + Catch Exception)");
 
-    x = {
+    var y = {
         get broken_property () { return undefined_variable++; }
     }
 
-    MoonConsole.ObjDump (x, true);
+    MoonConsole.ObjDump (y, true);
 
     AppendConsole ("Self Test");
     MoonConsole.ObjDump (MoonConsole);
 
+    AppendConsole ("Recursion Avoidance Test");
+    var z = { }
+    z.me = z;
+    
+    MoonConsole.ObjDump (z);
+    
+    var simple = {
+        name: "Aaron"
+    }
+
+    var a = { 
+        b: simple,
+        c: simple
+    }
+
+    MoonConsole.ObjDump (a);
 }
 </script>
 <script type="text/javascript">
@@ -122,7 +138,14 @@ window.addEventListener ("load", function () {
             var buffer = "";
             for (var i = 0; i < str.length; i++) {
                 var c = str.charAt (i);
-                buffer += c;
+                if (c == ">") {
+                    buffer += "&gt;";
+                } else if (c == "<") {
+                    buffer += "&lt;";
+                } else {
+                    buffer += c;
+                }
+
                 if (c == '\n') {
                     buffer += CreateLineNumber ();
                 }
