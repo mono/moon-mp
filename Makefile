@@ -1,5 +1,5 @@
 PACKAGE = moonlight-media-player
-VERSION = 0.1
+VERSION = 0.2
 MIN_FIREFOX_VERSION = 2.0.0.0
 MAX_FIREFOX_VERSION = 3.1.*
 
@@ -30,7 +30,7 @@ install.rdf: install.rdf.in
 
 $(XPI_FILE): install.rdf
 	rm -f $@
-	zip -oqrX9 $@ $(DIST_FILES) -x "*/.svn/*"
+	zip -oqrX9 $@ $(DIST_FILES) -x "*/.svn/*" -x "*test-moon-console.html"
 
 web/index.html: index.html.in
 	sed -e " \
