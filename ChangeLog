@@ -1,5 +1,26 @@
 2008-12-23  Aaron Bockover  <abock@gnome.org>
 
+	* content/uri-player.xul: Removed, merged into standalone-player.xul
+
+	* content/standalone-player-hidecontrols.xul:
+	* content/standalone-player-hidecontrols.css: XUL and CSS overlay to 
+	hide controls when running inside of a browser
+
+	* content/standalone-player.xul: A XUL shell that embeds the media player
+	that can act as a fully standalone player, like a mini Totem, when
+	invoked with firefox -chrome
+
+	* content/standalone-player.js: Application logic for the standalone
+	player
+
+	* content/moon-media-content-listener.js: Fix chrome URI
+
+	* content/player/player.js: Added a public Fullscreen method
+
+	* content/moon-utilities.js: Some Utility functions
+
+2008-12-23  Aaron Bockover  <abock@gnome.org>
+
 	* content/uri-player.xul: decodeURI before setting on the player
 
 2008-12-23  Aaron Bockover  <abockover@novell.com>

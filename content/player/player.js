@@ -338,13 +338,17 @@ __MoonEmbeddedMediaPlayer.prototype = {
 
     _OnKeyDown: function (o, args) {
         switch (args.Key) {
-            /* F, F11 */ case 35: case 66: this.control.Content.FullScreen = true; break;
+            /* F, F11 */ case 35: case 66: this.Fullscreen (); break;
             /* Up     */ case 15: this.PlaybackVolume += 0.05; break;
             /* Down   */ case 17: this.PlaybackVolume -= 0.05; break;
             /* Space  */ case 9:  this.TogglePlaying (); break;
         }
         
         this.ShowControls ();
+    },
+
+    Fullscreen: function () {
+        this.control.Content.FullScreen = true;
     },
     
     _OnMouseEnter: function (o, args) {

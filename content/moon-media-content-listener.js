@@ -69,8 +69,7 @@ MoonMediaContentListener.prototype = {
         // against the contentType, which will in turn be translated to Silverlight
         MoonConsole.Logfa.apply (this, arguments);
 
-        // For now I'll settle for this, but really we should reuse the current window
-        document.location = "chrome://moon-media/content/uri-player.xul?" + encodeURI (uri);
+        document.location = "chrome://moon-media/content/standalone-player.xul?uri=" + encodeURI (uri);
     }
 }
 
