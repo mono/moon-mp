@@ -32,6 +32,8 @@ var MoonMediaExtension = {
 
         var uri_content_listener = new MoonMediaContentListener;
         uri_content_listener.Register ();
+
+        MoonMediaExtension.DisableConflictingPlugins ();
     },
 
     FindRootDocument: function (in_doc) {
@@ -103,6 +105,25 @@ var MoonMediaExtension = {
         
         if (count - handled <= 0) {
             notification_box.removeChild (notification);
+        }
+    },
+
+    DisableConflictingPlugins: function () {
+        try {
+            Components.classes["@mozilla.org/plugin/host;1"]
+                .getService (Components.interfaces.nsIPluginHost)
+                .getPluginTags ({})
+                .forEach (function (plugin) {
+                    var path = plugin.filename.toLowerCase ();
+                    if (path.indexOf ("gmp") >= 0 && path.indexOf ("totem")) {
+                        if (!plugin.disabled) {
+                            MoonConsole.Log ("Disabled conflicting Moonlight Media Player plugin: " + plugin.name);
+                        }
+                        plugin.disabled = true;
+                    }
+                });
+        } catch (e) {
+            MoonConsole.Logf (MoonMediaExtension, "Could work with the plugin host service: " + e.message);
         }
     },
     

@@ -1,3 +1,7 @@
+2008-12-24  Aaron Bockover  <abock@gnome.org>
+
+	* content/moon-media-extension.js: Disable the totem-gmp plugin
+
 2008-12-23  Aaron Bockover  <abock@gnome.org>
 
 	* content/uri-player.xul: Removed, merged into standalone-player.xul
