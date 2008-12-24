@@ -49,7 +49,7 @@ StandaloneMoonPlayer.prototype = {
     },
     
     ConfigureWindow: function () {
-
+        window.title = "Moonlight Media Player";
     },
 
     LoadSource: function (path) {
