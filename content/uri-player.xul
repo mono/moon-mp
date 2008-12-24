@@ -9,7 +9,7 @@
     function XULMoonEmbeddedPlayerInit (player) {
         var uri = document.location.toString ();
         uri = uri.substring (uri.indexOf ("?") + 1);
-        player.LoadSource (uri);
+        player.LoadSource (decodeURI (uri));
     }
 ]]>
 </script>

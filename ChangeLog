@@ -1,3 +1,7 @@
+2008-12-23  Aaron Bockover  <abock@gnome.org>
+
+	* content/uri-player.xul: decodeURI before setting on the player
+
 2008-12-23  Aaron Bockover  <abockover@novell.com>
 
 	* content/moon-media-content-listener.js: Listener that intercepts content 
