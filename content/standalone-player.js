@@ -43,7 +43,7 @@ StandaloneMoonPlayer.prototype = {
             location.query_string[keyval[0]] = keyval[1];
         }
 
-        if (location.query_string["controls"] != "show") {
+        if (location.query_string["controls"] == "hide") {
             document.loadOverlay ("chrome://moon-media/content/standalone-player-hidecontrols.xul", null);
         }
     },

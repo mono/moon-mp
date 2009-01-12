@@ -69,7 +69,7 @@ MoonMediaContentListener.prototype = {
         // against the contentType, which will in turn be translated to Silverlight
         MoonConsole.Logfa.apply (this, arguments);
 
-        document.location = "chrome://moon-media/content/standalone-player.xul?uri=" + encodeURI (uri);
+        document.location = "chrome://moon-media/content/standalone-player.xul?uri=" + encodeURI (uri) + "&controls=hide";
     }
 }
 

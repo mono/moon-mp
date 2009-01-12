@@ -26,13 +26,14 @@
     <!--<menu label="View">
       <menupopup>
         <menuitem label="Fullscreen" onclick="window.player.OnFullscreen ()"/>
+        <menuitem label="Toggle Controls" onclick="window.player.OnToggleControls ()"/>
       </menupopup>
-    </menu>-->
+    </menu>
     <menu label="Help">
       <menupopup>
         <menuitem label="About" onclick="alert ('Moonlight Media Player')"/>
       </menupopup>
-    </menu>
+    </menu>-->
   </menubar>
   <html:object id="moon-embedded-player" type="application/x-silverlight" flex="1">
     <html:param name="source" value="chrome://moon-media/content/player/player.xaml"/>
