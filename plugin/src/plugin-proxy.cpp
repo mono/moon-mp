@@ -118,7 +118,7 @@ moon_mp_load_moonlight ()
 	return NPERR_NO_ERROR;
 }
 
-NPError OSCALL
+NPError
 NP_Initialize (NPNetscapeFuncs *mozilla_funcs, NPPluginFuncs *plugin_funcs)
 {
 	mp_debug ("NP_Initialize (%p, %p)", mozilla_funcs, plugin_funcs);
@@ -132,7 +132,7 @@ NP_Initialize (NPNetscapeFuncs *mozilla_funcs, NPPluginFuncs *plugin_funcs)
 }
 
 NPError
-NP_Shutdown (void)
+NP_Shutdown ()
 {
 	mp_debug ("NP_Shutdown");
 
