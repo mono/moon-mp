@@ -1,8 +1,8 @@
 INCLUDES = \
-	-I$(srcdir)/moz-sdk \
 	$(MOZILLA_CFLAGS) \
-	$(GLIB_CFLAGS)
-	-Wall
+	$(GLIB_CFLAGS) \
+	-Wall \
+	-ggdb3
 
 mpplugindir=$(libdir)/browser-plugins
 mpplugin_LTLIBRARIES = libmoonmp-plugin.la
@@ -15,7 +15,7 @@ libmoonmp_plugin_la_LDFLAGS = \
 libmoonmp_plugin_la_LIBADD = $(GLIB_LIBS)
 
 libmoonmp_plugin_la_SOURCES = \
-	plugin-entry.cpp
+	plugin-proxy.cpp
 
 test-plugin:
 	mkdir -p ~/.mozilla/plugins
