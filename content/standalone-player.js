@@ -17,11 +17,15 @@ StandaloneMoonPlayer.prototype = {
 
     content: null,
     player: null,
+    command_line: null,
 
     Initialize: function () {
         if (window.player) {
             throw "StandaloneMoonPlayer already installed on window";
         }
+
+        this.command_line = window.arguments[0]
+            .QueryInterface (Components.interfaces.nsICommandLine);
 
         window.player = this;
         this.content = document.getElementById ("moon-media-standalone-player");
@@ -30,7 +34,10 @@ StandaloneMoonPlayer.prototype = {
     },
 
     MoonlightInitialize: function () {
-        if (location.query_string["uri"]) {
+        file_arg = this.command_line.getArgument (0);
+        if (file_arg && file_arg.length > 0) {
+            this.LoadSource (file_arg);
+        } else if (location.query_string["uri"]) {
             this.LoadSource (location.query_string["uri"]);
         }
     },
@@ -53,7 +60,7 @@ StandaloneMoonPlayer.prototype = {
     },
 
     LoadSource: function (path) {
-        this.player.LoadSource (decodeURI (MoonUtilities.PathToURI (path)));
+        this.player.LoadSource (decodeURI (this.command_line.resolveURI (path).spec));
     },
 
     OnFileOpen: function () {

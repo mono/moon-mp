@@ -1,5 +1,11 @@
 2009-01-12  Aaron Bockover  <abock@gnome.org>
 
+	* standalone/moonlight-media-player.desktop.in: Pass %U to Exec
+
+	* content/standalone-player.js: Handle command line argument
+
+2009-01-12  Aaron Bockover  <abock@gnome.org>
+
 	* content/standalone-player.xul: Disable the View menu and listen
 	to unload, which will kill the moonlight element
 
