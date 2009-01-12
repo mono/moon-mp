@@ -114,8 +114,7 @@ var MoonMediaExtension = {
                 .getService (Components.interfaces.nsIPluginHost)
                 .getPluginTags ({})
                 .forEach (function (plugin) {
-                    var path = plugin.filename.toLowerCase ();
-                    if (path.indexOf ("gmp") >= 0 && path.indexOf ("totem")) {
+                    if (/totem[^a-z]*gmp/i.test (plugin.filename)) {
                         if (!plugin.disabled) {
                             MoonConsole.Log ("Disabled conflicting Moonlight Media Player plugin: " + plugin.name);
                         }

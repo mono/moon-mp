@@ -12,6 +12,7 @@
 <script type="application/x-javascript">
 <![CDATA[
     window.addEventListener ("load", function () { new StandaloneMoonPlayer; }, false);
+    window.addEventListener ("unload", function () { }, false);
 ]]>
 </script>
 <vbox flex="1" width="300" height="250">
@@ -22,11 +23,11 @@
         <menuitem label="Quit" onclick="window.close ()"/>
       </menupopup>
     </menu>
-    <menu label="View">
+    <!--<menu label="View">
       <menupopup>
         <menuitem label="Fullscreen" onclick="window.player.OnFullscreen ()"/>
       </menupopup>
-    </menu>
+    </menu>-->
     <menu label="Help">
       <menupopup>
         <menuitem label="About" onclick="alert ('Moonlight Media Player')"/>

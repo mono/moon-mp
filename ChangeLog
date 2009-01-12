@@ -1,3 +1,10 @@
+2009-01-12  Aaron Bockover  <abock@gnome.org>
+
+	* content/standalone-player.xul: Disable the View menu and listen
+	to unload, which will kill the moonlight element
+
+	* content/moon-media-extension.js: Better test for Totem
+
 2008-12-24  Aaron Bockover  <abock@gnome.org>
 
 	* content/moon-media-extension.js: Disable the totem-gmp plugin
