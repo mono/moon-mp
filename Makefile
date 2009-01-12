@@ -8,6 +8,7 @@ XPI_FILE = $(PACKAGE)-$(VERSION).xpi
 DIST_FILES = \
 	content \
 	skin \
+	standalone \
 	install.rdf \
 	chrome.manifest \
 	license.txt
@@ -30,7 +31,7 @@ install.rdf: install.rdf.in
 
 $(XPI_FILE): install.rdf
 	rm -f $@
-	zip -oqrX9 $@ $(DIST_FILES) -x "*/.svn/*" -x "*test-moon-console.html"
+	zip -oqrX9 $@ $(DIST_FILES) -x "*/.svn/*" -x "*test-moon-console.html" -x "*standalone/extensions*" -x "*standalone/updates*"
 
 web/index.html: index.html.in
 	sed -e " \
