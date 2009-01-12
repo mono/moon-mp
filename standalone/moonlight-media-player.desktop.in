@@ -2,8 +2,8 @@
 GenericName=WMV Player
 Name=Moonlight WM
 Comment=Standalone player for Windows Media content
-Exec=xulrunner
-Icon=video-x-generic
+Exec=moonlight-media-player
+Icon=moonlight-media-player
 Terminal=false
 Type=Application
 Categories=GNOME;GTK;AudioVideo;Video;Player;X-Ximian-Main;X-Red-Hat-Base;

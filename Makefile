@@ -1,7 +1,10 @@
 PACKAGE = moonlight-media-player
-VERSION = 0.2
+VERSION = 0.3
 MIN_FIREFOX_VERSION = 2.0.0.0
 MAX_FIREFOX_VERSION = 3.1.*
+MIN_GECKO_VERSION = 1.9.0
+MAX_GECKO_VERSION = 1.9.*
+BUILD_ID = `date +%Y%m%d%H%M%S`
 
 XPI_FILE = $(PACKAGE)-$(VERSION).xpi
 
@@ -15,6 +18,8 @@ DIST_FILES = \
 
 CLEAN_FILES = \
 	install.rdf \
+	standalone/application.ini \
+	standalone/moonlight-media-player.desktop \
 	$(XPI_FILE) \
 	web \
 	$(PACKAGE)-$(VERSION).tar.bz2
@@ -29,9 +34,21 @@ install.rdf: install.rdf.in
 		s/\@MIN_FIREFOX_VERSION\@/$(MIN_FIREFOX_VERSION)/g; \
 	" < $< > $@
 
-$(XPI_FILE): install.rdf
+standalone/application.ini: standalone/application.ini.in
+	sed -e " \
+		s/\@VERSION\@/$(VERSION)/g; \
+		s/\@BUILD_ID\@/$(BUILD_ID)/g; \
+		s/\@MAX_GECKO_VERSION\@/$(MAX_GECKO_VERSION)/g; \
+		s/\@MIN_GECKO_VERSION\@/$(MIN_GECKO_VERSION)/g; \
+	" < $< > $@
+
+standalone/moonlight-media-player.desktop: standalone/moonlight-media-player.desktop.in
+	cp $< $@
+	echo "MimeType=`grep -E '^[[:space:]]*\"[a-z]+\/[a-z\-]+\"' < content/moon-media-extension.js | sed 's,[^a-z\/\-],,g' | awk '{printf $$1 ";"}'`" >> $@
+
+$(XPI_FILE): install.rdf standalone/application.ini standalone/moonlight-media-player.desktop
 	rm -f $@
-	zip -oqrX9 $@ $(DIST_FILES) -x "*/.svn/*" -x "*test-moon-console.html" -x "*standalone/extensions*" -x "*standalone/updates*"
+	zip -oqrX9 $@ $(DIST_FILES) -x "*/.svn/*" -x "*test-moon-console.html" -x "*standalone/extensions*" -x "*standalone/updates*" -x "*.in"
 
 web/index.html: index.html.in
 	sed -e " \
