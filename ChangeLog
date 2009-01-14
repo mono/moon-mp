@@ -1,3 +1,12 @@
+2009-01-14  Aaron Bockover  <abock@gnome.org>
+
+	* content/standalone-player.js: Fix URI resolution in the case that the
+	command line COM component is unavailable to do the resolution; do not
+	show the application controls if there is no said command line component,
+	indicating that we are running embedded and not standalone
+
+	* content/moon-media-content-listener.js: Remove the 'hide' URI component
+
 2009-01-12  Aaron Bockover  <abock@gnome.org>
 
 	* standalone/moonlight-media-player.desktop.in: Pass %U to Exec
