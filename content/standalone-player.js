@@ -24,8 +24,10 @@ StandaloneMoonPlayer.prototype = {
             throw "StandaloneMoonPlayer already installed on window";
         }
 
-        this.command_line = window.arguments[0]
-            .QueryInterface (Components.interfaces.nsICommandLine);
+        if (window.arguments && window.arguments[0]) {
+            this.command_line = window.arguments[0]
+                .QueryInterface (Components.interfaces.nsICommandLine);
+        }
 
         window.player = this;
         this.content = document.getElementById ("moon-media-standalone-player");
@@ -34,7 +36,7 @@ StandaloneMoonPlayer.prototype = {
     },
 
     MoonlightInitialize: function () {
-        file_arg = this.command_line.getArgument (0);
+        file_arg = this.command_line ? this.command_line.getArgument (0) : null;
         if (file_arg && file_arg.length > 0) {
             this.LoadSource (file_arg);
         } else if (location.query_string["uri"]) {
@@ -49,8 +51,8 @@ StandaloneMoonPlayer.prototype = {
             var keyval = pairs[i].split ("=");
             location.query_string[keyval[0]] = keyval[1];
         }
-
-        if (location.query_string["controls"] == "hide") {
+        
+        if (!this.command_line) {
             document.loadOverlay ("chrome://moon-media/content/standalone-player-hidecontrols.xul", null);
         }
     },
@@ -60,7 +62,12 @@ StandaloneMoonPlayer.prototype = {
     },
 
     LoadSource: function (path) {
-        this.player.LoadSource (decodeURI (this.command_line.resolveURI (path).spec));
+        var uri = path;
+        if (this.command_line) {
+            uri = this.command_line.resolveURI (path).spec;
+        }
+
+        this.player.LoadSource (decodeURI (uri));
     },
 
     OnFileOpen: function () {

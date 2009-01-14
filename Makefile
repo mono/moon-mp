@@ -83,6 +83,9 @@ dist: clean
 clean:
 	rm -rf $(CLEAN_FILES)
 
+run:
+	MOZ_PLUGIN_PATH=/usr/lib/moon/plugin xulrunner standalone/application.ini
+
 install-dev:
 	@ff_path=$$HOME/.mozilla/firefox; \
 	profiles=(`grep Path= $${ff_path}/profiles.ini | cut -f2 -d=`); \
